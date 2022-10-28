@@ -47,17 +47,54 @@ contract AMMTest is Test {
 
     function test_swapAtoB() public {
         uint256 amountToSwap = 1_000_000e18;
-        deal(tokenAaddr, alice, amountToSwap);
-        vm.prank(alice);
+        tokenA.mint(address(this), amountToSwap);
+        
+        tokenA.approve(address(amm), amountToSwap);
         amm.swapTokenAToTokenB(amountToSwap);
 
-        uint256 aliceTokenBBalance = tokenB.balanceOf(alice);
-        assertEq(aliceTokenBBalance, 500_000);
+        uint256 myTokenBBalance = tokenB.balanceOf(address(this));
+        assertEq(myTokenBBalance, 500_000e18);
 
         uint256 ammTokenABalance = tokenA.balanceOf(address(amm));
-        assertEq(ammTokenABalance, 2_000_000);
+        assertEq(ammTokenABalance, 2_000_000e18);
 
         uint256 ammTokenBBalance = tokenB.balanceOf(address(amm));
-        assertEq(ammTokenBBalance, 500_000);
+        assertEq(ammTokenBBalance, 500_000e18);
+    }
+
+    function test_swapBtoA() public {
+        uint256 amountToSwap = 1_000_000e18;
+        tokenB.mint(address(this), amountToSwap);
+        
+        tokenB.approve(address(amm), amountToSwap);
+        amm.swapTokenBToTokenA(amountToSwap);
+
+        uint256 myTokenABalance = tokenA.balanceOf(address(this));
+        assertEq(myTokenABalance, 500_000e18);
+
+        uint256 ammTokenBBalance = tokenB.balanceOf(address(amm));
+        assertEq(ammTokenBBalance, 2_000_000e18);
+
+        uint256 ammTokenABalance = tokenA.balanceOf(address(amm));
+        assertEq(ammTokenABalance, 500_000e18);
+    }
+
+    function testRevert_swapAtoBLowBalance() public {
+        uint256 amountToSwap = 1_000_000e18;
+        tokenA.mint(address(this), amountToSwap-100);
+        
+        tokenA.approve(address(amm), amountToSwap);
+        vm.expectRevert("Insufficient balance");
+        amm.swapTokenAToTokenB(amountToSwap);
+
+    }
+
+    function testRevert_swapBtoALowBalance() public {
+        uint256 amountToSwap = 1_000_000e18;
+        tokenB.mint(address(this), amountToSwap-100);
+        
+        tokenB.approve(address(amm), amountToSwap);
+        vm.expectRevert("Insufficient balance");
+        amm.swapTokenBToTokenA(amountToSwap);
     }
 }

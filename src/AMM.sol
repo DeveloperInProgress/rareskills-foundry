@@ -4,9 +4,9 @@ pragma solidity ^0.8.13;
 import "openzeppelin-contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "openzeppelin-contracts/utils/math/SafeMath.sol";
 import "openzeppelin-contracts/access/Ownable.sol";
-import "@openzeppelin-contracts/proxy/utils/Initializable.sol";
+import "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract AMM is Initalizable {
+contract AMM is Initializable {
     using SafeMath for uint256;
     using SafeMath for uint8;
 
@@ -22,9 +22,9 @@ contract AMM is Initalizable {
 
         tokenA = IERC20Metadata(tokenAaddr);
         tokenB = IERC20Metadata(tokenBaddr);
-    }   
+    }
 
-    function initialize() public initalizer {
+    function initialize() public initializer {
         uint8 tokenAdecimals = tokenA.decimals();
         uint256 requiredTknABits = (10**tokenAdecimals).mul(1_000_000);
 
@@ -45,24 +45,30 @@ contract AMM is Initalizable {
     }
 
     function swapTokenAToTokenB(uint256 _amount) external {
+        uint256 userTokenABalance = tokenA.balanceOf(msg.sender);
+        require(userTokenABalance >= _amount, "Insufficient balance");
+        
         uint256 tokenABalance = tokenA.balanceOf(address(this));
         uint256 tokenBBalance = tokenB.balanceOf(address(this));
 
         uint256 updatedTokenABalance = tokenABalance + _amount;
         uint256 tokenBAmountToReceive = tokenBBalance.mul(_amount).div(updatedTokenABalance);
 
-        tokenA.transferFrom(address(this), msg.sender, _amount);
+        tokenA.transferFrom(msg.sender, address(this), _amount);
         tokenB.transfer(msg.sender, tokenBAmountToReceive);
     }  
 
     function swapTokenBToTokenA(uint256 _amount) external {
+        uint256 userTokenBBalance = tokenB.balanceOf(msg.sender);
+        require(userTokenBBalance >= _amount, "Insufficient balance");
+        
         uint256 tokenABalance = tokenA.balanceOf(address(this));
         uint256 tokenBBalance = tokenB.balanceOf(address(this));
 
         uint256 updatedTokenBBalance = tokenBBalance + _amount;
         uint256 tokenAAmountToReceive = tokenABalance.mul(_amount).div(updatedTokenBBalance);
 
-        tokenB.transferFrom(address(this), msg.sender, _amount);
+        tokenB.transferFrom(msg.sender, address(this),  _amount);
         tokenA.transfer(msg.sender, tokenAAmountToReceive);
     }  
 }
