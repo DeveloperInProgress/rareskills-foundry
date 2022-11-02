@@ -25,7 +25,7 @@ contract GenBukowskiNFT is ERC721 {
 
 
     function mint() external payable {
-        require(tokenSupply < MAX_SUPPLY, "No more tokens availabel");
+        require(tokenSupply < MAX_SUPPLY, "No more tokens available");
         require(msg.value == MINT_COST, "Incorrect price");
         
         _mint(msg.sender, tokenSupply);
@@ -37,7 +37,7 @@ contract GenBukowskiNFT is ERC721 {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "ipfs://QmcU4C8mdCa3vTi5SKgUnSzKBRzFitPyxqtJjqj3rPHDyZ";
+        return "ipfs://QmcU4C8mdCa3vTi5SKgUnSzKBRzFitPyxqtJjqj3rPHDyZ/";
     }
 
     function withdraw() external onlyDeployer {
