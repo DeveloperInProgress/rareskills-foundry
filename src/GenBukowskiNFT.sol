@@ -4,6 +4,9 @@ pragma solidity 0.8.13;
 import "openzeppelin-contracts/token/ERC721/ERC721.sol";
 import "openzeppelin-contracts/utils/Strings.sol";
 
+//0xd57B5794709B8a9604581A6fe666Fc416dc8A452
+//Goerli
+
 contract GenBukowskiNFT is ERC721 {
 
     using Strings for uint256;
